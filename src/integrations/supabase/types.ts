@@ -9,7 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bot_sessions: {
+        Row: {
+          created_at: string
+          current_step: string | null
+          first_name: string | null
+          id: string
+          language_code: string | null
+          last_name: string | null
+          session_data: Json | null
+          telegram_user_id: number
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_step?: string | null
+          first_name?: string | null
+          id?: string
+          language_code?: string | null
+          last_name?: string | null
+          session_data?: Json | null
+          telegram_user_id: number
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_step?: string | null
+          first_name?: string | null
+          id?: string
+          language_code?: string | null
+          last_name?: string | null
+          session_data?: Json | null
+          telegram_user_id?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      telegram_orders: {
+        Row: {
+          created_at: string
+          id: string
+          order_data: Json
+          status: string | null
+          telegram_user_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_data: Json
+          status?: string | null
+          telegram_user_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_data?: Json
+          status?: string | null
+          telegram_user_id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
