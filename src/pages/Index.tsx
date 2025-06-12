@@ -87,7 +87,7 @@ const Index = () => {
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => setCurrentStep('language')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium transition-colors"
               >
                 🚀 Start Order
               </button>
@@ -149,20 +149,20 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="container mx-auto max-w-lg">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-blue-900 mb-2">
+          <h1 className="text-2xl font-bold text-primary mb-2">
             FilterPro Bot
           </h1>
-          <p className="text-blue-700 text-sm">
+          <p className="text-muted-foreground text-sm">
             🇰🇭 Sihanoukville Water Filter Delivery
           </p>
         </div>
         
         {renderStep()}
         
-        <div className="mt-8 text-center text-xs text-gray-500">
+        <div className="mt-8 text-center text-xs text-muted-foreground">
           Bot ID: 8044639726:AAE9GaAznkWPEiPjYru8kTUNq0zGi8HYXMw
         </div>
       </div>
