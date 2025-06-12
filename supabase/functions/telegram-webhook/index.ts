@@ -22,7 +22,7 @@ const QR_PAYMENT_URLS = {
   1: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
   2: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
   3: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
-  4: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5'
+  4: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9'
 }
 
 // Updated delivery times
