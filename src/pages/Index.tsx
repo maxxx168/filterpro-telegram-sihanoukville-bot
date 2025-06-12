@@ -84,13 +84,19 @@ const Index = () => {
         return (
           <div className="space-y-6">
             <WelcomeScreen language={orderData.language || 'en'} />
-            <div className="text-center">
+            <div className="flex flex-col gap-3">
               <button 
                 onClick={() => setCurrentStep('language')}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
               >
                 🚀 Start Order
               </button>
+              <a 
+                href="/telegram"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors text-center no-underline"
+              >
+                🤖 Telegram Bot Setup
+              </a>
             </div>
           </div>
         );
