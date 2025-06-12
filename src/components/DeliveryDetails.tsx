@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -121,15 +120,15 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
 
         <div>
           <label className="text-sm font-medium mb-2 block">{t.selectTime}</label>
-          <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+          <div className="space-y-2">
             {DELIVERY_TIMES.map((time) => (
               <Button
-                key={time}
-                variant={deliveryTime === time ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setDeliveryTime(time)}
+                key={time.key}
+                variant={deliveryTime === time.value ? 'default' : 'outline'}
+                className="w-full"
+                onClick={() => setDeliveryTime(time.value)}
               >
-                {time}
+                {time.label}
               </Button>
             ))}
           </div>
