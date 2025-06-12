@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { translations } from '@/utils/translations';
+import { PRICING } from '@/types/bot';
 
 interface PaymentMethodProps {
   language: string;
   quantity: number;
+  customQuantity?: boolean;
   onSelectPayment: (method: 'qr' | 'cash') => void;
   onBack: () => void;
 }
@@ -15,12 +16,12 @@ interface PaymentMethodProps {
 const PaymentMethod: React.FC<PaymentMethodProps> = ({ 
   language, 
   quantity,
+  customQuantity = false,
   onSelectPayment, 
   onBack 
 }) => {
   const t = translations[language as keyof typeof translations] || translations.en;
-  const pricePerUnit = 25;
-  const total = quantity * pricePerUnit;
+  const total = PRICING[quantity] || (quantity * 5.5);
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -31,6 +32,11 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <Badge variant="secondary" className="text-lg">
           {t.total}: ${total}
         </Badge>
+        {customQuantity && (
+          <Badge variant="outline" className="text-sm">
+            Custom Quantity: {quantity}
+          </Badge>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <Button

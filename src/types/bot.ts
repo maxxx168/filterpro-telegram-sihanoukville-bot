@@ -1,4 +1,3 @@
-
 export interface Language {
   code: string;
   name: string;
@@ -17,6 +16,7 @@ export interface OrderData {
   deliveryDate: 'today' | 'tomorrow';
   deliveryTime: string;
   paymentMethod: 'qr' | 'cash';
+  customQuantity?: boolean;
 }
 
 export const LANGUAGES: Language[] = [
@@ -26,9 +26,25 @@ export const LANGUAGES: Language[] = [
   { code: 'km', name: 'ខ្មែរ', flag: '🇰🇭' },
 ];
 
+// Updated pricing structure to match bot
+export const PRICING = {
+  1: 5.5,
+  2: 11,
+  3: 16.5,
+  4: 22
+};
+
+// QR Payment URLs based on quantity (matching bot)
+export const QR_PAYMENT_URLS = {
+  1: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
+  2: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
+  3: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
+  4: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9'
+};
+
+// Updated delivery times to match bot (3 time slots)
 export const DELIVERY_TIMES = [
-  '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-  '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM',
-  '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM',
-  '9:00 PM', '10:00 PM'
+  { key: 'morning', label: 'Morning (9:00-12:00)', value: '9:00-12:00' },
+  { key: 'afternoon', label: 'Afternoon (13:00-16:00)', value: '13:00-16:00' },
+  { key: 'evening', label: 'Evening (16:00-22:00)', value: '16:00-22:00' }
 ];

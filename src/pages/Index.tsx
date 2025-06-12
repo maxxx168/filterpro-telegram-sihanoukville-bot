@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import WelcomeScreen from '@/components/WelcomeScreen';
@@ -22,8 +21,12 @@ const Index = () => {
     setCurrentStep('quantity');
   };
 
-  const handleQuantitySelect = (quantity: number) => {
-    setOrderData({ ...orderData, quantity });
+  const handleQuantitySelect = (quantity: number, isCustom = false) => {
+    setOrderData({ 
+      ...orderData, 
+      quantity,
+      customQuantity: isCustom
+    });
     setCurrentStep('delivery');
   };
 
@@ -123,6 +126,7 @@ const Index = () => {
           <PaymentMethod
             language={orderData.language!}
             quantity={orderData.quantity!}
+            customQuantity={orderData.customQuantity}
             onSelectPayment={handlePaymentSelect}
             onBack={goBack}
           />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,10 +26,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
       <CardContent className="space-y-4 text-center">
         <div className="space-y-2">
           <Badge variant="secondary" className="w-full justify-center py-2">
-            📢 Updates: @quickMakss
+            📢 {t.channelInfo}
           </Badge>
           <Badge variant="outline" className="w-full justify-center py-2">
-            👨‍💼 Manager: @quickMakss
+            👨‍💼 {t.managerInfo}
           </Badge>
         </div>
         
@@ -49,7 +48,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           className="w-full"
           onClick={onStartOver}
         >
-          🔄 Place Another Order
+          🔄 {t.startNewOrder}
         </Button>
       </CardContent>
     </Card>
