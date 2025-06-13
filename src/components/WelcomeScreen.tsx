@@ -11,23 +11,50 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
   const t = translations[language as keyof typeof translations] || translations.en;
 
+  // Telegram Login Widget Component
+  const TelegramLoginWidget = () => {
+    React.useEffect(() => {
+      const script = document.createElement('script');
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.setAttribute('data-telegram-login', 'FilterProBot');
+      script.setAttribute('data-size', 'large');
+      script.setAttribute('data-auth-url', 'https://uyjdsmdrwhrbammeivek.supabase.co/functions/v1/telegram-auth');
+      script.setAttribute('data-request-access', 'write');
+      script.async = true;
+      
+      const container = document.getElementById('telegram-login-widget');
+      if (container) {
+        container.innerHTML = '';
+        container.appendChild(script);
+      }
+
+      return () => {
+        if (container && script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+      };
+    }, []);
+
+    return <div id="telegram-login-widget" className="flex justify-center mb-4"></div>;
+  };
+
   return (
-    <Card className="w-full max-w-md mx-auto bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+    <Card className="w-full max-w-md mx-auto bg-[#0b0f16] border-gray-700">
       <CardHeader className="text-center">
         <div className="text-6xl mb-4">💧</div>
-        <CardTitle className="text-2xl text-blue-900 mb-2">
+        <CardTitle className="text-2xl text-blue-400 mb-2">
           Welcome to FilterPro Bot Order
         </CardTitle>
-        <p className="text-blue-700 text-base mb-2">
+        <p className="text-blue-300 text-base mb-2">
           Your easy solution for instant clean water right at your doorstep
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-400">
           Sihanoukville, Cambodia
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-white/50 rounded-lg p-4 space-y-2">
-          <Badge variant="secondary" className="w-full justify-center py-2">
+        <div className="bg-[#02050e]/50 rounded-lg p-4 space-y-2">
+          <Badge variant="secondary" className="w-full justify-center py-2 bg-gray-700 text-gray-200">
             <a 
               href="https://t.me/FilterProShv" 
               target="_blank" 
@@ -37,7 +64,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
               📢 Join our channel: @FilterProShv
             </a>
           </Badge>
-          <Badge variant="outline" className="w-full justify-center py-2">
+          <Badge variant="outline" className="w-full justify-center py-2 border-gray-600 text-gray-300">
             <a 
               href="https://t.me/FilterProOrder" 
               target="_blank" 
@@ -48,11 +75,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
             </a>
           </Badge>
         </div>
-        <div className="text-center">
-          <div className="text-4xl mb-2">💧</div>
-          <p className="text-sm text-gray-600">FilterPro - Premium Water Filter</p>
-          <p className="text-xs text-gray-500">Sihanoukville, Cambodia</p>
-        </div>
+        
+        <TelegramLoginWidget />
       </CardContent>
     </Card>
   );

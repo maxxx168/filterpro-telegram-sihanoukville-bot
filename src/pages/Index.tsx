@@ -82,32 +82,6 @@ const Index = () => {
     }
   };
 
-  // Telegram Login Widget Component
-  const TelegramLoginWidget = () => {
-    React.useEffect(() => {
-      const script = document.createElement('script');
-      script.src = 'https://telegram.org/js/telegram-widget.js?22';
-      script.setAttribute('data-telegram-login', 'FilterProBot');
-      script.setAttribute('data-size', 'large');
-      script.setAttribute('data-auth-url', window.location.origin + '/auth/telegram');
-      script.setAttribute('data-request-access', 'write');
-      script.async = true;
-      
-      const container = document.getElementById('telegram-login-widget');
-      if (container) {
-        container.appendChild(script);
-      }
-
-      return () => {
-        if (container && script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      };
-    }, []);
-
-    return <div id="telegram-login-widget" className="flex justify-center mt-4"></div>;
-  };
-
   const renderStep = () => {
     switch (currentStep) {
       case 'welcome':
@@ -117,7 +91,7 @@ const Index = () => {
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => setCurrentStep('language')}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
               >
                 🚀 Start Order
               </button>
@@ -128,7 +102,6 @@ const Index = () => {
                 🤖 Telegram Bot Setup
               </a>
             </div>
-            <TelegramLoginWidget />
           </div>
         );
       case 'language':
@@ -181,7 +154,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020612] p-4">
+    <div className="min-h-screen bg-[#02050e] p-4">
       <div className="container mx-auto max-w-lg">
         {/* FilterPro Image at the top */}
         <div className="text-center mb-6">
