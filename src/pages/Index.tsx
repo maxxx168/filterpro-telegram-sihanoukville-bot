@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import WelcomeScreen from '@/components/WelcomeScreen';
@@ -81,6 +82,32 @@ const Index = () => {
     }
   };
 
+  // Telegram Login Widget Component
+  const TelegramLoginWidget = () => {
+    React.useEffect(() => {
+      const script = document.createElement('script');
+      script.src = 'https://telegram.org/js/telegram-widget.js?22';
+      script.setAttribute('data-telegram-login', 'FilterProBot');
+      script.setAttribute('data-size', 'large');
+      script.setAttribute('data-auth-url', window.location.origin + '/auth/telegram');
+      script.setAttribute('data-request-access', 'write');
+      script.async = true;
+      
+      const container = document.getElementById('telegram-login-widget');
+      if (container) {
+        container.appendChild(script);
+      }
+
+      return () => {
+        if (container && script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+      };
+    }, []);
+
+    return <div id="telegram-login-widget" className="flex justify-center mt-4"></div>;
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 'welcome':
@@ -101,6 +128,7 @@ const Index = () => {
                 🤖 Telegram Bot Setup
               </a>
             </div>
+            <TelegramLoginWidget />
           </div>
         );
       case 'language':
@@ -153,22 +181,18 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-[#020612] p-4">
       <div className="container mx-auto max-w-lg">
+        {/* FilterPro Image at the top */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-primary mb-2">
-            FilterPro Bot
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            🇰🇭 Sihanoukville Water Filter Delivery
-          </p>
+          <img 
+            src="/lovable-uploads/10f097f0-b96d-4750-bd44-c82ae374d0d2.png" 
+            alt="FilterPro Sediment Cartridge" 
+            className="w-full max-w-md mx-auto rounded-lg shadow-lg"
+          />
         </div>
         
         {renderStep()}
-        
-        <div className="mt-8 text-center text-xs text-muted-foreground">
-          Bot ID: 8044639726:AAE9GaAznkWPEiPjYru8kTUNq0zGi8HYXMw
-        </div>
       </div>
     </div>
   );

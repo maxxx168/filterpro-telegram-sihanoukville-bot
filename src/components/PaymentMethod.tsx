@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { translations } from '@/utils/translations';
-import { PRICING } from '@/types/bot';
+import { PRICING, QR_PAYMENT_URLS } from '@/types/bot';
 
 interface PaymentMethodProps {
   language: string;
@@ -22,6 +23,12 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 }) => {
   const t = translations[language as keyof typeof translations] || translations.en;
   const total = PRICING[quantity] || (quantity * 5.5);
+
+  const handleQRPayment = () => {
+    const qrUrl = customQuantity ? QR_PAYMENT_URLS.custom : QR_PAYMENT_URLS[quantity] || QR_PAYMENT_URLS[1];
+    window.open(qrUrl, '_blank');
+    onSelectPayment('qr');
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -42,7 +49,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <Button
           variant="outline"
           className="w-full h-16 flex flex-col items-center justify-center hover:bg-blue-50 hover:border-blue-300"
-          onClick={() => onSelectPayment('qr')}
+          onClick={handleQRPayment}
         >
           <div className="text-2xl mb-1">📱</div>
           <span>{t.qrPayment}</span>

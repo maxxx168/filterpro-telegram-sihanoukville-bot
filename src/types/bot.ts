@@ -1,3 +1,4 @@
+
 export interface Language {
   code: string;
   name: string;
@@ -34,12 +35,13 @@ export const PRICING = {
   4: 22
 };
 
-// QR Payment URLs based on quantity (matching bot)
+// Updated QR Payment URLs based on quantity
 export const QR_PAYMENT_URLS = {
-  1: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
-  2: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
-  3: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
-  4: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9'
+  1: 'https://pay.ababank.com/iHeoEF1oWqsJguGn9',
+  2: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
+  3: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
+  4: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
+  custom: 'https://pay.ababank.com/KDugruTSgyhv8q4r6'
 };
 
 // Updated delivery times to match bot (3 time slots)

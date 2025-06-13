@@ -17,12 +17,13 @@ const PRICING = {
   4: 22
 }
 
-// QR Payment URLs based on quantity
+// Updated QR Payment URLs based on quantity
 const QR_PAYMENT_URLS = {
-  1: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
-  2: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
-  3: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
-  4: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9'
+  1: 'https://pay.ababank.com/iHeoEF1oWqsJguGn9',
+  2: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
+  3: 'https://pay.ababank.com/cXB6y5w7WnzrVbBx7',
+  4: 'https://pay.ababank.com/wxb7ADrgnmE94LAy5',
+  custom: 'https://pay.ababank.com/KDugruTSgyhv8q4r6'
 }
 
 // Updated delivery times
@@ -665,9 +666,9 @@ async function sendPaymentMethod(chatId: number, language: string, quantity: num
   })
 }
 
-async function sendQRPayment(chatId: number, language: string, quantity: number) {
+async function sendQRPayment(chatId: number, language: string, quantity: number, isCustom: boolean = false) {
   const t = translations[language] || translations.en
-  const qrUrl = QR_PAYMENT_URLS[quantity] || QR_PAYMENT_URLS[1]
+  const qrUrl = isCustom ? QR_PAYMENT_URLS.custom : (QR_PAYMENT_URLS[quantity] || QR_PAYMENT_URLS[1])
   
   const keyboard = {
     inline_keyboard: [
