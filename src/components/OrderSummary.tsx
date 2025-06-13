@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,28 +25,37 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
   const sendOrderToManager = async (orderId: string) => {
     try {
-      const orderDetails = `📋 Order Summary [${orderId}](https://uyjdsmdrwhrbammeivek.supabase.co/dashboard)
-📱 Telegram ID: ${localStorage.getItem('telegram_user_id') || 'Web User'}
-🚰 FilterPro Water Filter: ${orderData.quantity}x
+      const telegramUserId = localStorage.getItem('telegram_user_id');
+      const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
+
+🚰 Product: FilterPro Water Filter
+🔢 Quantity: ${orderData.quantity}${orderData.customQuantity ? ' (Custom)' : ''}
 💰 Total: $${total}
-${!localStorage.getItem('telegram_user_id') ? `📱 Phone: ${orderData.phone}` : ''}
-📍 Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
-📅 ${orderData.deliveryDate}
-⏰ ${orderData.deliveryTime}
+
+👤 Customer Info:
+${telegramUserId ? `📱 Telegram ID: ${telegramUserId}` : `📱 Phone: ${orderData.phone}`}
+
+📍 Delivery Details:
+Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
+📅 Date: ${orderData.deliveryDate}
+⏰ Time: ${orderData.deliveryTime}
+
 💳 Payment: ${orderData.paymentMethod === 'qr' ? 'QR Code Payment' : 'Cash on Delivery'}
 
-[Contact Manager](https://t.me/FilterProOrder)`;
+[Contact Customer](https://t.me/FilterProOrder)`;
 
-      // Send to manager via Telegram API
+      // Send to @FilterProOrder channel/user
       await fetch(`https://api.telegram.org/bot8044639726:AAE9GaAznkWPEiPjYru8kTUNq0zGi8HYXMw/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: '6922230327',
+          chat_id: '@FilterProOrder',
           text: orderDetails,
           parse_mode: 'Markdown'
         })
       });
+
+      console.log('Order notification sent to @FilterProOrder successfully');
     } catch (error) {
       console.error('Error sending order to manager:', error);
     }
@@ -61,7 +69,7 @@ ${!localStorage.getItem('telegram_user_id') ? `📱 Phone: ${orderData.phone}` :
         .from('telegram_orders')
         .insert({
           telegram_user_id: telegramUserId ? parseInt(telegramUserId) : 0,
-          order_data: orderData as any, // Cast to any to satisfy Json type
+          order_data: orderData as any,
           status: 'pending'
         })
         .select()
@@ -72,7 +80,7 @@ ${!localStorage.getItem('telegram_user_id') ? `📱 Phone: ${orderData.phone}` :
       return data.id;
     } catch (error) {
       console.error('Error saving order:', error);
-      return Math.random().toString(36).substr(2, 9); // Fallback ID
+      return Math.random().toString(36).substr(2, 9);
     }
   };
 
