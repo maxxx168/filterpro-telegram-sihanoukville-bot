@@ -55,11 +55,13 @@ ${!localStorage.getItem('telegram_user_id') ? `📱 Phone: ${orderData.phone}` :
 
   const saveOrderToDatabase = async () => {
     try {
+      const telegramUserId = localStorage.getItem('telegram_user_id');
+      
       const { data, error } = await supabase
         .from('telegram_orders')
         .insert({
-          telegram_user_id: parseInt(localStorage.getItem('telegram_user_id') || '0'),
-          order_data: orderData,
+          telegram_user_id: telegramUserId ? parseInt(telegramUserId) : 0,
+          order_data: orderData as any, // Cast to any to satisfy Json type
           status: 'pending'
         })
         .select()
