@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/utils/translations';
-import { DELIVERY_TIMES } from '@/types/bot';
 
 interface DeliveryDetailsProps {
   language: string;
@@ -18,144 +19,212 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
   onComplete, 
   onBack 
 }) => {
-  const t = translations[language as keyof typeof translations] || translations.en;
   const [phone, setPhone] = useState('');
-  const [deliveryDate, setDeliveryDate] = useState<'today' | 'tomorrow' | ''>('');
+  const [location, setLocation] = useState<any>(null);
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
-  const [location, setLocation] = useState({
-    latitude: 10.6098,
-    longitude: 103.4879,
-    address: 'Sihanoukville, Cambodia'
-  });
-
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const { toast } = useToast();
+  
+  const t = translations[language as keyof typeof translations] || translations.en;
   const isLoggedIn = !!localStorage.getItem('telegram_user_id');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isLoggedIn && !phone.trim()) {
-      alert(t.enterPhone);
+  const handleLocationRequest = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Location not supported",
+        description: "Your browser doesn't support location services",
+        variant: "destructive"
+      });
       return;
     }
+
+    setIsGettingLocation(true);
     
-    if (!deliveryDate) {
-      alert(t.selectDate);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({
+          latitude,
+          longitude,
+          address: 'Sihanoukville, Cambodia'
+        });
+        setIsGettingLocation(false);
+        toast({
+          title: "Location received! ✅",
+          description: "Your location has been captured successfully",
+        });
+      },
+      (error) => {
+        setIsGettingLocation(false);
+        toast({
+          title: "Location access denied",
+          description: "Please allow location access or enter your address manually",
+          variant: "destructive"
+        });
+        // Set default location
+        setLocation({
+          latitude: 10.6104,
+          longitude: 103.5282,
+          address: 'Sihanoukville, Cambodia'
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  };
+
+  const handleSubmit = () => {
+    if (!isLoggedIn && (!phone || !phone.startsWith('+855'))) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number starting with +855",
+        variant: "destructive"
+      });
       return;
     }
-    
-    if (!deliveryTime) {
-      alert(t.selectTime);
+
+    if (!location) {
+      toast({
+        title: "Location required",
+        description: "Please share your location",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!deliveryDate || !deliveryTime) {
+      toast({
+        title: "Delivery details required",
+        description: "Please select delivery date and time",
+        variant: "destructive"
+      });
       return;
     }
 
     onComplete({
-      phone: isLoggedIn ? `+855${localStorage.getItem('telegram_user_id')}` : phone,
+      phone: isLoggedIn ? null : phone,
       location,
       deliveryDate,
       deliveryTime
     });
   };
 
+  const deliveryTimes = [
+    { key: 'morning', label: 'Morning (9:00-12:00)', value: '9:00-12:00' },
+    { key: 'afternoon', label: 'Afternoon (13:00-16:00)', value: '13:00-16:00' },
+    { key: 'evening', label: 'Evening (16:00-22:00)', value: '16:00-22:00' }
+  ];
+
   return (
     <Card className="w-full max-w-md mx-auto bg-[#0b0f16] border-gray-700">
       <CardHeader className="text-center">
         <CardTitle className="text-xl text-blue-400">
-          {t.deliveryDetails}
+          📦 {t.deliveryDetails}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLoggedIn && (
-            <div>
-              <label className="text-sm font-medium text-gray-300 mb-2 block">
-                📱 {t.phoneNumber}
-              </label>
-              <Input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+855..."
-                className="bg-[#02050e] border-gray-600 text-gray-200 placeholder-gray-400"
-              />
-            </div>
+      <CardContent className="space-y-4">
+        {!isLoggedIn && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">{t.phoneNumber}:</label>
+            <Input
+              type="tel"
+              placeholder="+855..."
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="bg-gray-800 border-gray-600 text-gray-200"
+            />
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-300">📍 Location:</label>
+          <Button
+            variant="outline"
+            className="w-full bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700"
+            onClick={handleLocationRequest}
+            disabled={isGettingLocation}
+          >
+            {isGettingLocation 
+              ? 'Getting location...' 
+              : location 
+                ? '✅ Location received'
+                : '📍 Share Location'
+            }
+          </Button>
+          {location && (
+            <p className="text-xs text-gray-400">
+              Location: {location.address}
+            </p>
           )}
+        </div>
 
-          <div>
-            <label className="text-sm font-medium text-gray-300 mb-3 block">
-              📅 {t.selectDate}
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant={deliveryDate === 'today' ? 'default' : 'outline'}
-                className={deliveryDate === 'today' 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                }
-                onClick={() => setDeliveryDate('today')}
-              >
-                {t.today}
-              </Button>
-              <Button
-                type="button"
-                variant={deliveryDate === 'tomorrow' ? 'default' : 'outline'}
-                className={deliveryDate === 'tomorrow' 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                }
-                onClick={() => setDeliveryDate('tomorrow')}
-              >
-                {t.tomorrow}
-              </Button>
-            </div>
-          </div>
+        <Separator className="bg-gray-600" />
 
-          <div>
-            <label className="text-sm font-medium text-gray-300 mb-3 block">
-              ⏰ {t.selectTime}
-            </label>
-            <div className="space-y-2">
-              {DELIVERY_TIMES.map((time) => (
-                <Button
-                  key={time.key}
-                  type="button"
-                  variant={deliveryTime === time.value ? 'default' : 'outline'}
-                  className={`w-full ${deliveryTime === time.value 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                    : 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                  }`}
-                  onClick={() => setDeliveryTime(time.value)}
-                >
-                  {t[time.key as keyof typeof t] || time.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
-            <div className="text-center">
-              <div className="text-2xl mb-1">📍</div>
-              <p className="text-blue-300 text-sm">{location.address}</p>
-            </div>
-          </div>
-
-          <div className="flex space-x-2">
-            <Button 
-              type="button"
-              variant="ghost" 
-              className="flex-1 text-gray-300 hover:text-white hover:bg-gray-700"
-              onClick={onBack}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-gray-300">📅 Delivery Date:</label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={deliveryDate === 'today' ? 'default' : 'outline'}
+              className={deliveryDate === 'today' 
+                ? 'bg-blue-600 hover:bg-blue-700' 
+                : 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700'
+              }
+              onClick={() => setDeliveryDate('today')}
             >
-              ← {t.back}
+              📅 {t.today}
             </Button>
-            <Button 
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            <Button
+              variant={deliveryDate === 'tomorrow' ? 'default' : 'outline'}
+              className={deliveryDate === 'tomorrow' 
+                ? 'bg-blue-600 hover:bg-blue-700' 
+                : 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700'
+              }
+              onClick={() => setDeliveryDate('tomorrow')}
             >
-              {t.next} →
+              📅 {t.tomorrow}
             </Button>
           </div>
-        </form>
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-gray-300">⏰ Delivery Time:</label>
+          <div className="space-y-2">
+            {deliveryTimes.map((time) => (
+              <Button
+                key={time.key}
+                variant={deliveryTime === time.value ? 'default' : 'outline'}
+                className={`w-full text-left ${
+                  deliveryTime === time.value
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700'
+                }`}
+                onClick={() => setDeliveryTime(time.value)}
+              >
+                {time.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex space-x-2 pt-4">
+          <Button 
+            variant="ghost" 
+            className="flex-1 text-gray-300 hover:text-white hover:bg-gray-700"
+            onClick={onBack}
+          >
+            ← {t.back}
+          </Button>
+          <Button 
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleSubmit}
+          >
+            {t.next} →
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

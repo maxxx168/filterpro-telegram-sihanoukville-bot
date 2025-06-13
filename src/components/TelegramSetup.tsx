@@ -4,13 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Copy, ExternalLink } from 'lucide-react';
+import { Copy, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const TelegramSetup: React.FC = () => {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isSettingWebhook, setIsSettingWebhook] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const botToken = '8044639726:AAE9GaAznkWPEiPjYru8kTUNq0zGi8HYXMw';
   const webhookEndpoint = 'https://uyjdsmdrwhrbammeivek.supabase.co/functions/v1/telegram-webhook';
@@ -66,6 +68,17 @@ const TelegramSetup: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -138,7 +151,7 @@ const TelegramSetup: React.FC = () => {
             <Button 
               variant="outline" 
               className="flex-1"
-              onClick={() => window.open(`https://t.me/FilterProBot`, '_blank')}
+              onClick={() => window.open(`https://t.me/filterproshv_bot`, '_blank')}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Bot in Telegram
