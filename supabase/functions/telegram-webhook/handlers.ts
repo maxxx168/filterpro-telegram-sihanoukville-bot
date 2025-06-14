@@ -1,7 +1,6 @@
-
 import { translations } from "./translations.ts"
 import { PRICING, deliveryTimes } from "./constants.ts"
-import { getUserSession, createUserSession, updateUserStep, updateSessionData, getLastOrder, saveOrder } from "./database.ts"
+import { getUserSession, createUserSession, updateUserStep, updateSessionData, getLastOrder, saveOrder, updateOrderStatus, getLastCompletedOrder } from "./database.ts"
 import { 
   sendLanguageSelection, 
   sendQuantitySelection,
@@ -30,10 +29,13 @@ export async function handleMessage(supabase: any, message: any) {
   }
 
   const lang = session.session_data?.language || 'en'
+  const t = translations[lang] || translations.en
 
   if (text === '/start') {
     await updateUserStep(supabase, userId, 'language')
-    await sendLanguageSelection(chatId, translations[lang])
+    await sendLanguageSelection(chatId, t)
+  } else if (text === '/last_order') {
+    await handleLastOrder(supabase, userId, chatId, lang)
   } else if (session.current_step === 'custom_quantity_input') {
     await handleCustomQuantityInput(supabase, userId, chatId, text, session)
   } else if (message.location && session.current_step === 'location_request') {
@@ -148,6 +150,23 @@ export async function handleCallbackQuery(supabase: any, callbackQuery: any) {
     }
   } else if (data === 'confirm_order') {
     await confirmOrder(supabase, userId, chatId, lang, session.session_data, session.username)
+  } else if (data.startsWith('complete_')) {
+    const orderId = data.split('_')[1];
+    await updateOrderStatus(supabase, orderId, 'completed');
+    
+    const newText = `✅ Order marked as completed!\n\n${callbackQuery.message.text}`;
+
+    await fetch(`${TELEGRAM_API}/editMessageText`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message_id: callbackQuery.message.message_id,
+        text: newText,
+        parse_mode: 'Markdown',
+        reply_markup: { inline_keyboard: [] }
+      })
+    });
   } else if (data === 'back') {
     await handleBackButton(supabase, userId, chatId, session)
   } else if (data === 'new_order') {
@@ -234,6 +253,42 @@ async function confirmOrder(supabase: any, userId: number, chatId: number, langu
   await sendOrderConfirmationMessages(chatId, t, sessionData, price, orderId, userId, username)
   
   await updateUserStep(supabase, userId, 'welcome')
+}
+
+async function handleLastOrder(supabase: any, userId: number, chatId: number, lang: string) {
+    const t = translations[lang] || translations.en;
+    const lastOrder = await getLastCompletedOrder(supabase, userId);
+
+    if (lastOrder) {
+        const orderData = lastOrder.order_data;
+        const price = PRICING[orderData.quantity] || (orderData.quantity * 5.5);
+        // Using hardcoded strings for now as adding new translations is a separate step
+        const summaryText = `📋 *Your Last Order*\n\n` +
+            `🔢 Quantity: ${orderData.quantity}x\n` +
+            `💰 Total: *$${price}*\n` +
+            `📅 Ordered on: ${new Date(lastOrder.created_at).toLocaleDateString()}\n` +
+            `✅ Status: Completed`;
+        
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: summaryText,
+                parse_mode: 'Markdown'
+            })
+        });
+    } else {
+        await fetch(`${TELEGRAM_API}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: "You have no past completed orders.",
+                parse_mode: 'Markdown'
+            })
+        });
+    }
 }
 
 async function handleBackButton(supabase: any, userId: number, chatId: number, session: any) {

@@ -1,4 +1,3 @@
-
 export async function getUserSession(supabase: any, userId: number) {
   const { data } = await supabase
     .from('bot_sessions')
@@ -70,4 +69,28 @@ export async function saveOrder(supabase: any, userId: number, orderData: any) {
   }
 
   return savedOrder
+}
+
+export async function updateOrderStatus(supabase: any, orderId: string, status: string) {
+  const { error } = await supabase
+    .from('telegram_orders')
+    .update({ status: status })
+    .eq('id', orderId)
+  
+  if (error) {
+    console.error('Error updating order status:', error)
+  }
+}
+
+export async function getLastCompletedOrder(supabase: any, userId: number) {
+  const { data } = await supabase
+    .from('telegram_orders')
+    .select('order_data, created_at, status')
+    .eq('telegram_user_id', userId)
+    .eq('status', 'completed')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return data
 }

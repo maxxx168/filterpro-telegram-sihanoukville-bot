@@ -220,36 +220,47 @@ export async function sendOrderSummary(chatId: number, t: any, sessionData: any)
 }
 
 export async function sendOrderConfirmationMessages(chatId: number, t: any, sessionData: any, price: number, orderId: string, userId: number, username?: string) {
-  const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
-
-🚰 Product: FilterPro Water Filter
-🔢 Quantity: ${sessionData.quantity}${sessionData.customQuantity ? ' (Custom)' : ''}
+  const supabaseLink = `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders/rows?filter=id%3Aeq%3A${orderId}`
+  const customerContactLink = `tg://user?id=${userId}`
+  const locationLink = sessionData.location ? `https://maps.google.com/?q=${sessionData.location.latitude},${sessionData.location.longitude}` : 'Not provided';
+  const customerIdentifier = sessionData.phone ? sessionData.phone : (username ? `@${username}` : userId);
+  
+  const orderDetails = `*New Order: [${orderId}]*
+  
+🔢 Quantity: ${sessionData.quantity}
 💰 Total: $${price}
-
-👤 Customer Info:
-${userId ? `📱 Telegram ID: ${userId}` : ''}
-${username ? `\n💬 Telegram Username: @${username}` : ''}
-${sessionData.phone ? `\n📱 Phone: ${sessionData.phone}` : ''}
-
-📍 Delivery Details:
-Location: ${sessionData.location?.address || 'Sihanoukville, Cambodia'}
 📅 Date: ${sessionData.deliveryDate === 'today' ? t.today : t.tomorrow}
 ⏰ Time: ${sessionData.deliveryTime}
-
 💳 Payment: ${sessionData.paymentMethod === 'qr' ? t.qrPayment : t.cashOnDelivery}
+📍 [Delivery Location](${locationLink})
 
-[Contact Customer](https://t.me/FilterProOrder)`
+👤 Customer: ${customerIdentifier}`
 
+  const managerKeyboard = {
+    inline_keyboard: [
+      [
+        { text: 'View in Supabase', url: supabaseLink },
+        { text: 'Contact Customer', url: customerContactLink }
+      ],
+      [
+        { text: '✅ Mark as Completed', callback_data: `complete_${orderId}` }
+      ]
+    ]
+  }
+
+  // Message to manager/channel
   await fetch(`${TELEGRAM_API}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      chat_id: -1002863245380,
+      chat_id: -1002863245380, // Manager Chat ID
       text: orderDetails,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
+      reply_markup: managerKeyboard
     })
   })
 
+  // Message to customer
   const keyboard = {
     inline_keyboard: [
       [{ text: `🔄 ${t.startNewOrder}`, callback_data: 'new_order' }]
