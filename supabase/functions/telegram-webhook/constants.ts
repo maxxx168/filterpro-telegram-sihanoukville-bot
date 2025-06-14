@@ -1,4 +1,6 @@
 
+export const TELEGRAM_API = `https://api.telegram.org/bot${Deno.env.get('TELEGRAM_BOT_TOKEN')}`
+
 export const PRICING = {
   1: 5.5,
   2: 11,
