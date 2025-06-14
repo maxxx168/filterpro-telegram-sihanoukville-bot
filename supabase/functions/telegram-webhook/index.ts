@@ -1,15 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Telegram Bot API Base URL
 const TELEGRAM_API = `https://api.telegram.org/bot${Deno.env.get('TELEGRAM_BOT_TOKEN')}`
 
-// Updated pricing structure
 const PRICING = {
   1: 5.5,
   2: 11,
@@ -17,7 +14,6 @@ const PRICING = {
   4: 22
 }
 
-// Updated QR Payment URLs based on quantity
 const QR_PAYMENT_URLS = {
   1: 'https://pay.ababank.com/iHeoEF1oWqsJguGn9',
   2: 'https://pay.ababank.com/BJc9j9GqBsF1M28v9',
@@ -26,21 +22,19 @@ const QR_PAYMENT_URLS = {
   custom: 'https://pay.ababank.com/KDugruTSgyhv8q4r6'
 }
 
-// Updated delivery times
 const deliveryTimes = [
   { key: 'morning', label: 'Morning (9:00-12:00)', value: '9:00-12:00' },
   { key: 'afternoon', label: 'Afternoon (13:00-16:00)', value: '13:00-16:00' },
   { key: 'evening', label: 'Evening (16:00-22:00)', value: '16:00-22:00' }
 ]
 
-// Translations
 const translations = {
   en: {
     welcome: 'Welcome to FilterPro Bot! 🚰',
     welcomeDesc: 'Your premium water filter solution for Sihanoukville, Cambodia',
     channelInfo: 'Join our channel: @FilterProShv',
     managerInfo: 'Contact manager: @FilterProOrder',
-    selectLanguage: 'Select your language:',
+    selectLanguage: 'Please select your language:',
     selectQuantity: 'How many FilterPro units would you like?',
     customQuantity: 'Custom Quantity',
     enterCustomQuantity: 'Please enter the quantity you want (number only):',
@@ -49,20 +43,20 @@ const translations = {
     shareContact: 'Share Contact',
     shareLocation: 'Share Location',
     phoneNumber: 'Phone number',
-    selectDate: 'Select delivery date:',
+    selectDate: '📦 Select delivery date:',
     today: 'Today',
     tomorrow: 'Tomorrow',
     selectTime: 'Select delivery time:',
     morning: 'Morning (9:00-12:00)',
     afternoon: 'Afternoon (13:00-16:00)',
     evening: 'Evening (16:00-22:00)',
-    paymentMethod: 'Payment method:',
+    paymentMethod: 'Select your payment method:',
     qrPayment: 'QR Code Payment',
     cashOnDelivery: 'Cash on Delivery',
     orderSummary: 'Order Summary',
     product: 'FilterPro Water Filter',
     total: 'Total',
-    noDeliveryFee: 'Free delivery in Sihanoukville!',
+    noDeliveryFee: '🚚 Delivery fee: FREE',
     confirmOrder: 'Confirm Order',
     orderConfirmed: 'Order confirmed! You will receive updates soon.',
     back: 'Back',
@@ -81,7 +75,7 @@ const translations = {
     welcomeDesc: 'Ваше премиальное решение для фильтрации воды в Сиануквиле, Камбоджа',
     channelInfo: 'Присоединяйтесь к нашему каналу: @FilterProShv',
     managerInfo: 'Связаться с менеджером: @FilterProOrder',
-    selectLanguage: 'Выберите язык:',
+    selectLanguage: 'Пожалуйста, выберите язык:',
     selectQuantity: 'Сколько устройств FilterPro вы хотите?',
     customQuantity: 'Другое количество',
     enterCustomQuantity: 'Пожалуйста, введите желаемое количество (только число):',
@@ -90,20 +84,20 @@ const translations = {
     shareContact: 'Поделиться контактом',
     shareLocation: 'Поделиться местоположением',
     phoneNumber: 'Номер телефона',
-    selectDate: 'Выберите дату доставки:',
+    selectDate: '📦 Выберите дату доставки:',
     today: 'Сегодня',
     tomorrow: 'Завтра',
     selectTime: 'Выберите время доставки:',
     morning: 'Утром (9:00-12:00)',
     afternoon: 'Днём (13:00-16:00)',
     evening: 'Вечером (16:00-22:00)',
-    paymentMethod: 'Способ оплаты:',
+    paymentMethod: 'Выберите способ оплаты:',
     qrPayment: 'Оплата QR-кодом',
     cashOnDelivery: 'Оплата при доставке',
     orderSummary: 'Сводка заказа',
     product: 'Фильтр для воды FilterPro',
     total: 'Итого',
-    noDeliveryFee: 'Бесплатная доставка в Сиануквиле!',
+    noDeliveryFee: '🚚 Стоимость доставки: БЕСПЛАТНО',
     confirmOrder: 'Подтвердить заказ',
     orderConfirmed: 'Заказ подтвержден! Вскоре вы получите обновления.',
     back: 'Назад',
@@ -122,7 +116,7 @@ const translations = {
     welcomeDesc: '您在柬埔寨西哈努克港的优质净水器解决方案',
     channelInfo: '加入我们的频道：@FilterProShv',
     managerInfo: '联系经理：@FilterProOrder',
-    selectLanguage: '选择您的语言：',
+    selectLanguage: '请选择您的语言：',
     selectQuantity: '您想要多少个 FilterPro 设备？',
     customQuantity: '自定义数量',
     enterCustomQuantity: '请输入您想要的数量（仅数字）：',
@@ -131,20 +125,20 @@ const translations = {
     shareContact: '分享联系方式',
     shareLocation: '分享位置',
     phoneNumber: '电话号码',
-    selectDate: '选择配送日期：',
+    selectDate: '📦 选择配送日期：',
     today: '今天',
     tomorrow: '明天',
     selectTime: '选择配送时间：',
     morning: '上午 (9:00-12:00)',
     afternoon: '下午 (13:00-16:00)',
     evening: '晚上 (16:00-22:00)',
-    paymentMethod: '付款方式：',
+    paymentMethod: '请选择您的付款方式：',
     qrPayment: '二维码支付',
     cashOnDelivery: '货到付款',
     orderSummary: '订单摘要',
     product: 'FilterPro 净水器',
     total: '总计',
-    noDeliveryFee: '西哈努克港免费配送！',
+    noDeliveryFee: '🚚 配送费: 免费',
     confirmOrder: '确认订单',
     orderConfirmed: '订单已确认！您很快就会收到更新。',
     back: '返回',
@@ -163,7 +157,7 @@ const translations = {
     welcomeDesc: 'ដំណោះស្រាយម៉ាស៊ីនចម្រោះទឹកដ៏ប្រណីតសម្រាប់ក្រុងព្រះសីហនុ កម្ពុជា',
     channelInfo: 'ចូលរួមឆានែលរបស់យើង៖ @FilterProShv',
     managerInfo: 'ទាក់ទងអ្នកគ្រប់គ្រង៖ @FilterProOrder',
-    selectLanguage: 'ជ្រើសរើសភាសារបស់អ្នក៖',
+    selectLanguage: 'សូមជ្រើសរើសភាសារបស់អ្នក៖',
     selectQuantity: 'តើអ្នកចង់បាន FilterPro ប៉ុន្មានគ្រឿង?',
     customQuantity: 'ចំនួនផ្សេង',
     enterCustomQuantity: 'សូមបញ្ចូលចំនួនដែលអ្នកចង់បាន (តែលេខប៉ុណ្ណោះ)៖',
@@ -172,20 +166,20 @@ const translations = {
     shareContact: 'ចែករំលែកទំនាក់ទំនង',
     shareLocation: 'ចែករំលែកទីតាំង',
     phoneNumber: 'លេខទូរស័ព្ទ',
-    selectDate: 'ជ្រើសរើសកាលបរិច្ឆេទដឹកជញ្ជូន៖',
+    selectDate: '📦 ជ្រើសរើសកាលបរិច្ឆេទដឹកជញ្ជូន៖',
     today: 'ថ្ងៃនេះ',
     tomorrow: 'ស្អែក',
     selectTime: 'ជ្រើសរើសម៉ោងដឹកជញ្ជូន៖',
     morning: 'ព្រឹក (9:00-12:00)',
     afternoon: 'រសៀល (13:00-16:00)',
     evening: 'ល្ងាច (16:00-22:00)',
-    paymentMethod: 'វិធីសាស្រ្តបង់ប្រាក់៖',
+    paymentMethod: 'សូមជ្រើសរើសវិធីសាស្រ្តបង់ប្រាក់របស់អ្នក៖',
     qrPayment: 'ការបង់ប្រាក់ QR កូដ',
     cashOnDelivery: 'បង់ប្រាក់នៅពេលដឹកជញ្ជូន',
     orderSummary: 'សេចក្តីសង្ខេបនៃការបញ្ជាទិញ',
     product: 'ម៉ាស៊ីនចម្រោះទឹក FilterPro',
     total: 'សរុប',
-    noDeliveryFee: 'ការដឹកជញ្ជូនឥតគិតថ្លៃនៅព្រះសីហនុ!',
+    noDeliveryFee: '🚚 ថ្លៃដឹកជញ្ជូន៖ ឥតគិតថ្លៃ',
     confirmOrder: 'បញ្ជាក់ការបញ្ជាទិញ',
     orderConfirmed: 'ការបញ្ជាទិញត្រូវបានបញ្ជាក់! អ្នកនឹងទទួលបានការធ្វើបច្ចុប្បន្នភាពក្នុងពេលឆាប់ៗនេះ។',
     back: 'ថយក្រោយ',
@@ -207,7 +201,7 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    const supabase = (await import("https://esm.sh/@supabase/supabase-js@2")).createClient(
       "https://uyjdsmdrwhrbammeivek.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5amRzbWRyd2hyYmFtbWVpdmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NTc0MTksImV4cCI6MjA2NTIzMzQxOX0.posI7iBdmqfPpU88Wkduv6fVo-IgWbo2XyF1ECcFeKw"
     )
@@ -243,13 +237,9 @@ async function handleMessage(supabase: any, message: any) {
 
   if (text === '/start') {
     await updateUserStep(supabase, userId, 'language')
-    await sendLanguageSelection(chatId)
-  } else if (session.current_step === 'phone_input') {
-    await handlePhoneInput(supabase, userId, chatId, text, session)
+    await sendLanguageSelection(chatId, lang)
   } else if (session.current_step === 'custom_quantity_input') {
     await handleCustomQuantityInput(supabase, userId, chatId, text, session)
-  } else if (message.contact && session.current_step === 'contact_request') {
-    await handleContactReceived(supabase, userId, chatId, message.contact, session)
   } else if (message.location && session.current_step === 'location_request') {
     await handleLocationReceived(supabase, userId, chatId, message.location, session)
   }
@@ -281,9 +271,10 @@ async function handleCallbackQuery(supabase: any, callbackQuery: any) {
     if (quantity) {
       await updateSessionData(supabase, userId, { 
         ...session.session_data, 
-        quantity 
-      }, 'contact_request')
-      await sendContactRequest(chatId, lang)
+        quantity,
+        phone: callbackQuery.from.phone_number || null
+      }, 'location_request')
+      await sendLocationRequest(chatId, lang)
     } else {
       await updateSessionData(supabase, userId, session.session_data, 'custom_quantity_input')
       await sendCustomQuantityRequest(chatId, lang)
@@ -321,7 +312,7 @@ async function handleCallbackQuery(supabase: any, callbackQuery: any) {
     await handleBackButton(supabase, userId, chatId, session)
   } else if (data === 'new_order') {
     await updateUserStep(supabase, userId, 'language')
-    await sendLanguageSelection(chatId)
+    await sendLanguageSelection(chatId, lang)
   } else if (data === 'proceed_to_summary') {
     await sendOrderSummary(chatId, lang, session.session_data)
   }
@@ -370,7 +361,8 @@ async function updateSessionData(supabase: any, userId: number, sessionData: any
     .eq('telegram_user_id', userId)
 }
 
-async function sendLanguageSelection(chatId: number) {
+async function sendLanguageSelection(chatId: number, language: string) {
+  const t = translations[language] || translations.en;
   const keyboard = {
     inline_keyboard: [
       [
@@ -389,7 +381,7 @@ async function sendLanguageSelection(chatId: number) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: `🚰 *FilterPro Bot*\n\n${translations.en.welcomeDesc}\n\n📢 ${translations.en.channelInfo}\n👨‍💼 ${translations.en.managerInfo}\n\n${translations.en.selectLanguage}`,
+      text: `*${t.selectLanguage}*`,
       parse_mode: 'Markdown',
       reply_markup: keyboard
     })
@@ -419,7 +411,7 @@ async function sendQuantitySelection(chatId: number, language: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: `🚰 *${t.product}*\n\n${t.selectQuantity}\n\n🚚 ${t.noDeliveryFee}`,
+      text: `*${t.selectQuantity}*`,
       parse_mode: 'Markdown',
       reply_markup: keyboard
     })
@@ -468,77 +460,8 @@ async function handleCustomQuantityInput(supabase: any, userId: number, chatId: 
   await updateSessionData(supabase, userId, {
     ...session.session_data,
     quantity: quantity,
-    customQuantity: true
-  }, 'contact_request')
-
-  await sendContactRequest(chatId, lang)
-}
-
-async function sendContactRequest(chatId: number, language: string) {
-  const t = translations[language] || translations.en
-  
-  const keyboard = {
-    keyboard: [[{
-      text: `📱 ${t.shareContact}`,
-      request_contact: true
-    }]],
-    one_time_keyboard: true,
-    resize_keyboard: true
-  }
-
-  await fetch(`${TELEGRAM_API}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: `📱 ${t.enterPhone}`,
-      reply_markup: keyboard
-    })
-  })
-}
-
-async function handleContactReceived(supabase: any, userId: number, chatId: number, contact: any, session: any) {
-  const lang = session.session_data?.language || 'en'
-  const t = translations[lang] || translations.en
-
-  await updateSessionData(supabase, userId, {
-    ...session.session_data,
-    phone: contact.phone_number
-  }, 'location_request')
-
-  await fetch(`${TELEGRAM_API}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: `✅ ${t.contactReceived}`,
-      reply_markup: { remove_keyboard: true }
-    })
-  })
-
-  await sendLocationRequest(chatId, lang)
-}
-
-async function handlePhoneInput(supabase: any, userId: number, chatId: number, phoneText: string, session: any) {
-  const lang = session.session_data?.language || 'en'
-  const t = translations[lang] || translations.en
-
-  if (!phoneText.startsWith('+855') || phoneText.length < 10) {
-    await fetch(`${TELEGRAM_API}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: `❌ ${t.invalidPhone}`,
-        parse_mode: 'Markdown'
-      })
-    })
-    return
-  }
-
-  await updateSessionData(supabase, userId, {
-    ...session.session_data,
-    phone: phoneText
+    customQuantity: true,
+    phone: session.phone_number || null
   }, 'location_request')
 
   await sendLocationRequest(chatId, lang)
@@ -611,7 +534,7 @@ async function sendDeliveryDetails(chatId: number, language: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: `📦 *${t.deliveryDetails}*\n\n${t.selectDate}`,
+      text: `*${t.selectDate}*`,
       parse_mode: 'Markdown',
       reply_markup: keyboard
     })
@@ -659,7 +582,7 @@ async function sendPaymentMethod(chatId: number, language: string, quantity: num
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: `💳 *${t.paymentMethod}*\n\n${t.total}: *$${price}*\n\n🚚 ${t.noDeliveryFee}`,
+      text: `*💳 ${t.total}: $${price}*\n*${t.paymentMethod}*\n\n_if you plan to pay by cash, let the bot know if need to prepare some change_`,
       parse_mode: 'Markdown',
       reply_markup: keyboard
     })
@@ -697,11 +620,13 @@ async function sendOrderSummary(chatId: number, language: string, sessionData: a
   let summaryText = `📋 *${t.orderSummary}*\n\n`
   summaryText += `🚰 ${t.product}: ${sessionData.quantity}x\n`
   summaryText += `💰 ${t.total}: *$${price}*\n\n`
-  summaryText += `📱 Phone: ${sessionData.phone}\n`
+  if (sessionData.phone) {
+    summaryText += `📱 Phone: ${sessionData.phone}\n`
+  }
   summaryText += `📅 ${sessionData.deliveryDate === 'today' ? t.today : t.tomorrow}\n`
   summaryText += `⏰ ${sessionData.deliveryTime}\n`
   summaryText += `💳 ${sessionData.paymentMethod === 'qr' ? t.qrPayment : t.cashOnDelivery}\n\n`
-  summaryText += `🚚 ${t.noDeliveryFee}`
+  summaryText += `${t.noDeliveryFee}`
 
   const keyboard = {
     inline_keyboard: [
@@ -724,6 +649,7 @@ async function sendOrderSummary(chatId: number, language: string, sessionData: a
 
 async function confirmOrder(supabase: any, userId: number, chatId: number, language: string, sessionData: any) {
   const t = translations[language] || translations.en
+  const price = PRICING[sessionData.quantity] || (sessionData.quantity * 5.5)
 
   const orderData = {
     language: sessionData.language,
@@ -731,21 +657,45 @@ async function confirmOrder(supabase: any, userId: number, chatId: number, langu
     deliveryDate: sessionData.deliveryDate,
     deliveryTime: sessionData.deliveryTime,
     paymentMethod: sessionData.paymentMethod,
-    phone: sessionData.phone,
+    phone: sessionData.phone || null,
     location: sessionData.location,
     customQuantity: sessionData.customQuantity || false
   }
 
-  await supabase
+  const { data: savedOrder, error } = await supabase
     .from('telegram_orders')
     .insert({
       telegram_user_id: userId,
       order_data: orderData,
       status: 'pending'
     })
+    .select()
+    .single()
 
-  const price = PRICING[sessionData.quantity] || (sessionData.quantity * 5.5)
-  const orderDetails = `🚰 *NEW FILTERPRO ORDER*\n\n📦 Product: FilterPro Water Filter\n🔢 Quantity: ${sessionData.quantity}${sessionData.customQuantity ? ' (Custom)' : ''}\n💰 Total: $${price}\n\n📍 Location: ${sessionData.location?.address || 'Sihanoukville, Cambodia'}\n📱 Phone: ${sessionData.phone}\n\n📅 Delivery Date: ${sessionData.deliveryDate}\n⏰ Delivery Time: ${sessionData.deliveryTime}\n\n💳 Payment: ${sessionData.paymentMethod === 'qr' ? 'QR Code' : 'Cash on Delivery'}\n\nUser ID: ${userId}`
+  if (error) {
+    console.error('Error saving order to db:', error)
+  }
+
+  const orderId = savedOrder ? savedOrder.id : Math.random().toString(36).substr(2, 9);
+  
+  const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
+
+🚰 Product: FilterPro Water Filter
+🔢 Quantity: ${sessionData.quantity}${sessionData.customQuantity ? ' (Custom)' : ''}
+💰 Total: $${price}
+
+👤 Customer Info:
+${userId ? `📱 Telegram ID: ${userId}` : ''}
+${sessionData.phone ? `\n📱 Phone: ${sessionData.phone}` : ''}
+
+📍 Delivery Details:
+Location: ${sessionData.location?.address || 'Sihanoukville, Cambodia'}
+📅 Date: ${sessionData.deliveryDate === 'today' ? t.today : t.tomorrow}
+⏰ Time: ${sessionData.deliveryTime}
+
+💳 Payment: ${sessionData.paymentMethod === 'qr' ? t.qrPayment : t.cashOnDelivery}
+
+[Contact Customer](https://t.me/FilterProOrder)`
 
   await fetch(`${TELEGRAM_API}/sendMessage`, {
     method: 'POST',
@@ -783,16 +733,15 @@ async function handleBackButton(supabase: any, userId: number, chatId: number, s
   switch (session.current_step) {
     case 'quantity':
       await updateUserStep(supabase, userId, 'language')
-      await sendLanguageSelection(chatId)
+      await sendLanguageSelection(chatId, lang)
       break
-    case 'contact_request':
     case 'custom_quantity_input':
       await updateUserStep(supabase, userId, 'quantity')
       await sendQuantitySelection(chatId, lang)
       break
     case 'location_request':
-      await updateUserStep(supabase, userId, 'contact_request')
-      await sendContactRequest(chatId, lang)
+      await updateUserStep(supabase, userId, 'quantity')
+      await sendQuantitySelection(chatId, lang)
       break
     case 'delivery_details':
       await updateUserStep(supabase, userId, 'location_request')

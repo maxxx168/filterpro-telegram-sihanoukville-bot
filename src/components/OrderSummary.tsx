@@ -23,44 +23,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const t = translations[language as keyof typeof translations] || translations.en;
   const total = PRICING[orderData.quantity] || (orderData.quantity * 5.5);
 
-  const sendOrderToManager = async (orderId: string) => {
-    try {
-      const telegramUserId = localStorage.getItem('telegram_user_id');
-      const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
-
-🚰 Product: FilterPro Water Filter
-🔢 Quantity: ${orderData.quantity}${orderData.customQuantity ? ' (Custom)' : ''}
-💰 Total: $${total}
-
-👤 Customer Info:
-${telegramUserId ? `📱 Telegram ID: ${telegramUserId}` : `📱 Phone: ${orderData.phone}`}
-
-📍 Delivery Details:
-Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
-📅 Date: ${orderData.deliveryDate}
-⏰ Time: ${orderData.deliveryTime}
-
-💳 Payment: ${orderData.paymentMethod === 'qr' ? 'QR Code Payment' : 'Cash on Delivery'}
-
-[Contact Customer](https://t.me/FilterProOrder)`;
-
-      // Send to @FilterProOrder channel/user
-      await fetch(`https://api.telegram.org/bot8044639726:AAE9GaAznkWPEiPjYru8kTUNq0zGi8HYXMw/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: '@FilterProOrder',
-          text: orderDetails,
-          parse_mode: 'Markdown'
-        })
-      });
-
-      console.log('Order notification sent to @FilterProOrder successfully');
-    } catch (error) {
-      console.error('Error sending order to manager:', error);
-    }
-  };
-
   const saveOrderToDatabase = async () => {
     try {
       const telegramUserId = localStorage.getItem('telegram_user_id');
@@ -86,7 +48,37 @@ Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
 
   const handleConfirm = async () => {
     const orderId = await saveOrderToDatabase();
-    await sendOrderToManager(orderId);
+    
+    const telegramUserId = localStorage.getItem('telegram_user_id');
+    const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
+
+🚰 Product: FilterPro Water Filter
+🔢 Quantity: ${orderData.quantity}${orderData.customQuantity ? ' (Custom)' : ''}
+💰 Total: $${total}
+
+👤 Customer Info:
+${telegramUserId ? `📱 Telegram ID: ${telegramUserId}` : ''}
+${orderData.phone ? `\n📱 Phone: ${orderData.phone}` : ''}
+
+📍 Delivery Details:
+Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
+📅 Date: ${orderData.deliveryDate}
+⏰ Time: ${orderData.deliveryTime}
+
+💳 Payment: ${orderData.paymentMethod === 'qr' ? 'QR Code Payment' : 'Cash on Delivery'}
+
+[Contact Customer](https://t.me/FilterProOrder)`;
+
+    try {
+      const { error } = await supabase.functions.invoke('send-order-notification', {
+        body: { orderDetails },
+      });
+      if (error) throw error;
+      console.log('Order notification sent to manager successfully via edge function.');
+    } catch (error) {
+      console.error('Error sending order to manager:', error);
+    }
+    
     onConfirm();
   };
 
@@ -133,14 +125,14 @@ Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
           </div>
 
           <div className="bg-green-900/30 border border-green-700 rounded-lg p-2 text-center">
-            <span className="text-green-400 text-sm">✅ {t.noDeliveryFee}</span>
+            <span className="text-green-400 text-sm">✅ Free delivery</span>
           </div>
         </div>
 
         <Separator className="bg-gray-600" />
 
         <div className="space-y-2 text-sm">
-          {!isLoggedIn && (
+          {!isLoggedIn && orderData.phone && (
             <div className="flex justify-between">
               <span className="text-gray-400">📱 Phone:</span>
               <span className="text-gray-200">{orderData.phone}</span>

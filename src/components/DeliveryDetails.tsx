@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,10 +77,10 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
   };
 
   const handleSubmit = () => {
-    if (!isLoggedIn && (!phone || !phone.startsWith('+855'))) {
+    if (!isLoggedIn && !phone) {
       toast({
-        title: "Invalid phone number",
-        description: "Please enter a valid phone number starting with +855",
+        title: "Phone number required",
+        description: "Please enter your phone number.",
         variant: "destructive"
       });
       return;

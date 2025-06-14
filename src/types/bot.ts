@@ -13,7 +13,7 @@ export interface OrderData {
     longitude: number;
     address?: string;
   };
-  phone: string;
+  phone?: string;
   deliveryDate: 'today' | 'tomorrow';
   deliveryTime: string;
   paymentMethod: 'qr' | 'cash';

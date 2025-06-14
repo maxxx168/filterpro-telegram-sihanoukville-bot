@@ -46,7 +46,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
           Welcome to FilterPro Bot Order
         </CardTitle>
         <p className="text-blue-300 text-base mb-2">
-          Your easy solution for instant clean water right at your doorstep
+          Your easy solution for instant clean & clear water for all your family, right at your doorstep in just a few clicks !
         </p>
         <p className="text-sm text-gray-400">
           Sihanoukville, Cambodia
