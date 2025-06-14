@@ -701,7 +701,7 @@ Location: ${sessionData.location?.address || 'Sihanoukville, Cambodia'}
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      chat_id: '@FilterProOrder',
+      chat_id: -1002863245380,
       text: orderDetails,
       parse_mode: 'Markdown'
     })

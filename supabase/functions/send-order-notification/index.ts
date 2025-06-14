@@ -7,7 +7,7 @@ const corsHeaders = {
 }
 
 const TELEGRAM_API = `https://api.telegram.org/bot${Deno.env.get('TELEGRAM_BOT_TOKEN')}`
-const CHAT_ID = '@FilterProOrder'
+const CHAT_ID = -1002863245380
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
