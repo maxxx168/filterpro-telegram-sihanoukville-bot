@@ -14,6 +14,7 @@ export interface OrderData {
     address?: string;
   };
   phone?: string;
+  telegramId?: string;
   deliveryDate: 'today' | 'tomorrow';
   deliveryTime: string;
   paymentMethod: 'qr' | 'cash';

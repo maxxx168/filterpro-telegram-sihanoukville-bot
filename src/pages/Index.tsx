@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import WelcomeScreen from '@/components/WelcomeScreen';
@@ -36,6 +35,7 @@ const Index = () => {
       ...orderData, 
       location: details.location,
       phone: details.phone,
+      telegramId: details.telegramId,
       deliveryDate: details.deliveryDate,
       deliveryTime: details.deliveryTime
     });

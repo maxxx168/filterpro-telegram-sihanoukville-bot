@@ -68,7 +68,13 @@ const translations = {
     pleaseSelectTime: 'Please select a delivery time from the options above.',
     orderSubmitted: 'Your order has been submitted! 🎉\n\nOrder details sent to @FilterProOrder\nYou will receive updates soon.',
     startNewOrder: 'Start New Order',
-    payWithQR: 'Click the link below to pay with QR code:'
+    payWithQR: 'Click the link below to pay with QR code:',
+    sameLocationQuestion: 'Should we deliver to the same place?',
+    yesSamePlace: 'Yes, same place',
+    noNewPlace: 'No, new location',
+    sameTimeQuestion: 'Your last order was for',
+    sameTimeQuestionEnd: 'Same time again?',
+    yesSameTime: 'Yes, same time'
   },
   ru: {
     welcome: 'Добро пожаловать в FilterPro Bot! 🚰',
@@ -109,7 +115,13 @@ const translations = {
     pleaseSelectTime: 'Пожалуйста, выберите время доставки из вариантов выше.',
     orderSubmitted: 'Ваш заказ отправлен! 🎉\n\nДетали заказа отправлены @FilterProOrder\nВскоре вы получите обновления.',
     startNewOrder: 'Начать новый заказ',
-    payWithQR: 'Нажмите на ссылку ниже для оплаты QR-кодом:'
+    payWithQR: 'Нажмите на ссылку ниже для оплаты QR-кодом:',
+    sameLocationQuestion: 'Доставить по тому же адресу?',
+    yesSamePlace: 'Да, тот же адрес',
+    noNewPlace: 'Нет, новый адрес',
+    sameTimeQuestion: 'Ваш прошлый заказ был на',
+    sameTimeQuestionEnd: 'В это же время?',
+    yesSameTime: 'Да, в то же время'
   },
   zh: {
     welcome: '欢迎使用 FilterPro 机器人！🚰',
@@ -150,7 +162,13 @@ const translations = {
     pleaseSelectTime: '请从上面的选项中选择配送时间。',
     orderSubmitted: '您的订单已提交！🎉\n\n订单详情已发送给@FilterProOrder\n您很快就会收到更新。',
     startNewOrder: '开始新订单',
-    payWithQR: '点击下面的链接用二维码支付：'
+    payWithQR: '点击下面的链接用二维码支付：',
+    sameLocationQuestion: '我们应该送到同一个地方吗？',
+    yesSamePlace: '是的，同一个地方',
+    noNewPlace: '不，新地点',
+    sameTimeQuestion: '您的最后一个订单是给',
+    sameTimeQuestionEnd: '同样的时间吗？',
+    yesSameTime: '是的，同样的时间'
   },
   km: {
     welcome: 'សូមស្វាគមន៍មកកាន់ FilterPro Bot! 🚰',
@@ -191,7 +209,13 @@ const translations = {
     pleaseSelectTime: 'សូមជ្រើសរើសម៉ោងដឹកជញ្ជូនពីជម្រើសខាងលើ។',
     orderSubmitted: 'ការបញ្ជាទិញរបស់អ្នកត្រូវបានដាក់ស្នើ! 🎉\n\nព័ត៌មានលម្អិតនៃការបញ្ជាទិញត្រូវបានផ្ញើទៅ @FilterProOrder\nអ្នកនឹងទទួលបានការធ្វើបច្ចុប្បន្នភាពក្នុងពេលឆាប់ៗនេះ។',
     startNewOrder: 'ចាប់ផ្តើមការបញ្ជាទិញថ្មី',
-    payWithQR: 'ចុចលើតំណខាងក្រោមដើម្បីបង់ប្រាក់ដោយ QR កូដ៖'
+    payWithQR: 'ចុចលើតំណខាងក្រោមដើម្បីបង់ប្រាក់ដោយ QR កូដ៖',
+    sameLocationQuestion: 'តើ​យើង​គួរ​ដឹក​ជញ្ជូន​ទៅ​កន្លែង​ដដែល​ឬ?',
+    yesSamePlace: 'បាទ កន្លែងដដែល',
+    noNewPlace: 'ទេ ទីតាំងថ្មី។',
+    sameTimeQuestion: 'ការបញ្ជាទិញចុងក្រោយរបស់អ្នកគឺសម្រាប់',
+    sameTimeQuestionEnd: 'ពេល​វេលា​ដូច​គ្នា​ម្ដង​ទៀត?',
+    yesSameTime: 'បាទ ពេលវេលាដូចគ្នា។'
   }
 }
 
@@ -269,23 +293,67 @@ async function handleCallbackQuery(supabase: any, callbackQuery: any) {
   } else if (data.startsWith('qty_')) {
     const quantity = data === 'qty_custom' ? null : parseInt(data.split('_')[1])
     if (quantity) {
+      const lastOrder = await getLastOrder(supabase, userId);
+      const lastLocation = lastOrder?.order_data?.location;
+
       await updateSessionData(supabase, userId, { 
         ...session.session_data, 
         quantity,
         phone: callbackQuery.from.phone_number || null
-      }, 'location_request')
-      await sendLocationRequest(chatId, lang)
+      }, lastLocation ? 'confirm_location' : 'location_request')
+      
+      if (lastLocation) {
+        await sendLocationConfirmation(chatId, lang);
+      } else {
+        await sendLocationRequest(chatId, lang);
+      }
     } else {
       await updateSessionData(supabase, userId, session.session_data, 'custom_quantity_input')
       await sendCustomQuantityRequest(chatId, lang)
     }
+  } else if (data === 'confirm_loc_yes') {
+    const lastOrder = await getLastOrder(supabase, userId)
+    if (lastOrder && lastOrder.order_data.location) {
+        await updateSessionData(supabase, userId, {
+            ...session.session_data,
+            location: lastOrder.order_data.location
+        }, 'delivery_details')
+        await sendDeliveryDetails(chatId, lang)
+    } else {
+        await updateUserStep(supabase, userId, 'location_request')
+        await sendLocationRequest(chatId, lang)
+    }
+  } else if (data === 'confirm_loc_no') {
+      await updateUserStep(supabase, userId, 'location_request')
+      await sendLocationRequest(chatId, lang)
   } else if (data.startsWith('date_')) {
     const deliveryDate = data.split('_')[1]
+    
+    const lastOrder = await getLastOrder(supabase, userId);
+    const lastTime = lastOrder?.order_data?.deliveryTime;
+
     await updateSessionData(supabase, userId, {
       ...session.session_data,
       deliveryDate
-    }, 'time_selection')
-    await sendTimeSelection(chatId, lang)
+    }, lastTime ? 'confirm_time' : 'time_selection')
+    
+    if (lastTime) {
+      await sendTimeConfirmation(chatId, lang, lastTime);
+    } else {
+      await sendTimeSelection(chatId, lang);
+    }
+  } else if (data === 'confirm_time_yes') {
+    const lastOrder = await getLastOrder(supabase, userId)
+    if (lastOrder && lastOrder.order_data.deliveryTime) {
+        await updateSessionData(supabase, userId, {
+            ...session.session_data,
+            deliveryTime: lastOrder.order_data.deliveryTime
+        }, 'payment_method')
+        await sendPaymentMethod(chatId, lang, session.session_data.quantity)
+    } else {
+        await updateUserStep(supabase, userId, 'time_selection')
+        await sendTimeSelection(chatId, lang)
+    }
   } else if (data.startsWith('time_')) {
     const timeKey = data.split('_')[1]
     const timeSlot = deliveryTimes.find(t => t.key === timeKey)
@@ -307,7 +375,7 @@ async function handleCallbackQuery(supabase: any, callbackQuery: any) {
       await sendOrderSummary(chatId, lang, session.session_data)
     }
   } else if (data === 'confirm_order') {
-    await confirmOrder(supabase, userId, chatId, lang, session.session_data)
+    await confirmOrder(supabase, userId, chatId, lang, session.session_data, session.username)
   } else if (data === 'back') {
     await handleBackButton(supabase, userId, chatId, session)
   } else if (data === 'new_order') {
@@ -647,7 +715,7 @@ async function sendOrderSummary(chatId: number, language: string, sessionData: a
   })
 }
 
-async function confirmOrder(supabase: any, userId: number, chatId: number, language: string, sessionData: any) {
+async function confirmOrder(supabase: any, userId: number, chatId: number, language: string, sessionData: any, username?: string) {
   const t = translations[language] || translations.en
   const price = PRICING[sessionData.quantity] || (sessionData.quantity * 5.5)
 
@@ -658,6 +726,7 @@ async function confirmOrder(supabase: any, userId: number, chatId: number, langu
     deliveryTime: sessionData.deliveryTime,
     paymentMethod: sessionData.paymentMethod,
     phone: sessionData.phone || null,
+    telegramId: username,
     location: sessionData.location,
     customQuantity: sessionData.customQuantity || false
   }
@@ -686,6 +755,7 @@ async function confirmOrder(supabase: any, userId: number, chatId: number, langu
 
 👤 Customer Info:
 ${userId ? `📱 Telegram ID: ${userId}` : ''}
+${username ? `\n💬 Telegram Username: @${username}` : ''}
 ${sessionData.phone ? `\n📱 Phone: ${sessionData.phone}` : ''}
 
 📍 Delivery Details:
@@ -727,6 +797,61 @@ Location: ${sessionData.location?.address || 'Sihanoukville, Cambodia'}
   await updateUserStep(supabase, userId, 'welcome')
 }
 
+async function sendLocationConfirmation(chatId: number, language: string) {
+  const t = translations[language] || translations.en;
+  const text = t.sameLocationQuestion;
+  const yesText = t.yesSamePlace;
+  const noText = t.noNewPlace;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        { text: `✅ ${yesText}`, callback_data: 'confirm_loc_yes' },
+        { text: `🔄 ${noText}`, callback_data: 'confirm_loc_no' }
+      ],
+      [{ text: `← ${t.back}`, callback_data: 'back' }]
+    ]
+  };
+
+  await fetch(`${TELEGRAM_API}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: `📍 *${text}*`,
+      parse_mode: 'Markdown',
+      reply_markup: keyboard
+    })
+  });
+}
+
+async function sendTimeConfirmation(chatId: number, language: string, lastTime: string) {
+  const t = translations[language] || translations.en
+  const question = `${t.sameTimeQuestion} ${lastTime}. ${t.sameTimeQuestionEnd}`
+  const yesText = t.yesSameTime
+
+  const keyboard = {
+    inline_keyboard: [
+      [{ text: `✅ ${yesText}`, callback_data: `confirm_time_yes` }],
+      [{ text: `🌅 ${t.morning}`, callback_data: 'time_morning' }],
+      [{ text: `☀️ ${t.afternoon}`, callback_data: 'time_afternoon' }],
+      [{ text: `🌆 ${t.evening}`, callback_data: 'time_evening' }],
+      [{ text: `← ${t.back}`, callback_data: 'back' }]
+    ]
+  }
+
+  await fetch(`${TELEGRAM_API}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: `⏰ *${question}*`,
+      parse_mode: 'Markdown',
+      reply_markup: keyboard
+    })
+  })
+}
+
 async function handleBackButton(supabase: any, userId: number, chatId: number, session: any) {
   const lang = session.session_data?.language || 'en'
   
@@ -739,6 +864,10 @@ async function handleBackButton(supabase: any, userId: number, chatId: number, s
       await updateUserStep(supabase, userId, 'quantity')
       await sendQuantitySelection(chatId, lang)
       break
+    case 'confirm_location':
+      await updateUserStep(supabase, userId, 'quantity')
+      await sendQuantitySelection(chatId, lang)
+      break
     case 'location_request':
       await updateUserStep(supabase, userId, 'quantity')
       await sendQuantitySelection(chatId, lang)
@@ -747,9 +876,13 @@ async function handleBackButton(supabase: any, userId: number, chatId: number, s
       await updateUserStep(supabase, userId, 'location_request')
       await sendLocationRequest(chatId, lang)
       break
-    case 'time_selection':
+    case 'confirm_time':
       await updateUserStep(supabase, userId, 'delivery_details')
       await sendDeliveryDetails(chatId, lang)
+      break
+    case 'time_selection':
+      await updateUserStep(supabase, userId, 'time_selection')
+      await sendTimeSelection(chatId, lang)
       break
     case 'payment_method':
       await updateUserStep(supabase, userId, 'time_selection')
@@ -760,4 +893,16 @@ async function handleBackButton(supabase: any, userId: number, chatId: number, s
       await sendPaymentMethod(chatId, lang, session.session_data.quantity)
       break
   }
+}
+
+async function getLastOrder(supabase: any, userId: number) {
+  const { data } = await supabase
+    .from('telegram_orders')
+    .select('order_data')
+    .eq('telegram_user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  return data
 }

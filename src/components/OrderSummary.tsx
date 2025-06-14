@@ -59,6 +59,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 👤 Customer Info:
 ${telegramUserId ? `📱 Telegram ID: ${telegramUserId}` : ''}
 ${orderData.phone ? `\n📱 Phone: ${orderData.phone}` : ''}
+${orderData.telegramId ? `\n💬 Telegram Username: @${orderData.telegramId.replace('@', '')}` : ''}
 
 📍 Delivery Details:
 Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
@@ -136,6 +137,12 @@ Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
             <div className="flex justify-between">
               <span className="text-gray-400">📱 Phone:</span>
               <span className="text-gray-200">{orderData.phone}</span>
+            </div>
+          )}
+          {!isLoggedIn && orderData.telegramId && (
+            <div className="flex justify-between">
+              <span className="text-gray-400">💬 Telegram Username:</span>
+              <span className="text-gray-200">@{orderData.telegramId.replace('@', '')}</span>
             </div>
           )}
           <div className="flex justify-between">

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
   onBack 
 }) => {
   const [phone, setPhone] = useState('');
+  const [telegramId, setTelegramId] = useState('');
   const [location, setLocation] = useState<any>(null);
   const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
@@ -77,10 +79,10 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
   };
 
   const handleSubmit = () => {
-    if (!isLoggedIn && !phone) {
+    if (!isLoggedIn && !phone && !telegramId) {
       toast({
-        title: "Phone number required",
-        description: "Please enter your phone number.",
+        title: "Contact info required",
+        description: "Please enter your phone number or Telegram ID.",
         variant: "destructive"
       });
       return;
@@ -106,6 +108,7 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
 
     onComplete({
       phone: isLoggedIn ? null : phone,
+      telegramId: isLoggedIn ? null : telegramId,
       location,
       deliveryDate,
       deliveryTime
@@ -127,16 +130,37 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {!isLoggedIn && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t.phoneNumber}:</label>
-            <Input
-              type="tel"
-              placeholder="+855..."
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-gray-200"
-            />
-          </div>
+           <>
+            <div className="text-sm text-center text-gray-400">
+              Please provide a way to contact you:
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">{t.phoneNumber}:</label>
+              <Input
+                type="tel"
+                placeholder="+855..."
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="bg-gray-800 border-gray-600 text-gray-200"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Separator className="flex-1 bg-gray-600" />
+              <span className="text-xs text-gray-500">OR</span>
+              <Separator className="flex-1 bg-gray-600" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">Telegram Username:</label>
+              <Input
+                type="text"
+                placeholder="@username"
+                value={telegramId}
+                onChange={(e) => setTelegramId(e.target.value)}
+                className="bg-gray-800 border-gray-600 text-gray-200"
+              />
+            </div>
+            <Separator className="bg-gray-600" />
+          </>
         )}
 
         <div className="space-y-2">
