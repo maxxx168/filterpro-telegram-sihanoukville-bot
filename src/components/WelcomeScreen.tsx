@@ -52,7 +52,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
           Sihanoukville, Cambodia
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      {/*
+        <CardContent className="space-y-4">
         <div className="bg-[#02050e]/50 rounded-lg p-4 space-y-2">
           <Badge variant="secondary" className="w-full justify-center py-2 bg-gray-700 text-gray-200">
             <a 
@@ -77,7 +78,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ language }) => {
         </div>
         
         <TelegramLoginWidget />
-      </CardContent>
+        */} 
     </Card>
   );
 };
