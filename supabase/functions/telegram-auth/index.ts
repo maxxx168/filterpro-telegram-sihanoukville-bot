@@ -1,9 +1,36 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+function checkTelegramAuth(params: URLSearchParams, botToken: string): boolean {
+  const authData: Record<string, string> = {};
+  for (const [key, value] of params.entries()) {
+    if (key !== "hash") {
+      authData[key] = value;
+    }
+  }
+  const dataCheckString = Object.keys(authData)
+    .sort()
+    .map(key => `${key}=${authData[key]}`)
+    .join('\n');
+
+  const encoder = new TextEncoder();
+  const secret = await crypto.subtle.digest(
+    "SHA-256",
+    encoder.encode(botToken)
+  );
+  const key = new Uint8Array(secret);
+
+  const hmac = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(dataCheckString)
+  );
+  const hex = Array.from(new Uint8Array(hmac)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return hex === params.get("hash");
 }
 
 serve(async (req) => {
@@ -14,6 +41,14 @@ serve(async (req) => {
   try {
     const url = new URL(req.url)
     const params = url.searchParams
+
+    // --- ADD THIS: Secure hash verification ---
+    const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? '';
+    const isValid = await checkTelegramAuth(params, botToken);
+    if (!isValid) {
+      return new Response('Invalid Telegram login', { status: 403, headers: corsHeaders });
+    }
+    // -----------------------------------------
 
     // Extract Telegram auth data
     const id = params.get('id')

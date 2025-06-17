@@ -15,10 +15,16 @@ const Index = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<Step>('welcome');
   const [orderData, setOrderData] = useState<Partial<OrderData>>({});
+  const [showLogo, setShowLogo] = useState(() => true);
 
   const handleLanguageSelect = (language: string) => {
     setOrderData({ ...orderData, language });
     setCurrentStep('quantity');
+  };
+
+  const handleStartOrder = () => {
+    setShowLogo(false);
+    setCurrentStep('language');
   };
 
   const handleQuantitySelect = (quantity: number, isCustom = false) => {
@@ -81,29 +87,41 @@ const Index = () => {
         break;
     }
   };
-
+  
   const renderStep = () => {
     switch (currentStep) {
       case 'welcome':
         return (
           <div className="space-y-6">
             <WelcomeScreen language={orderData.language || 'en'} />
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 mt-4">
               <button 
-                onClick={() => setCurrentStep('language')}
+                onClick={handleStartOrder}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
               >
                 🚀 Start Order
               </button>
+            <div className="flex flex-col gap-3 mt-4">
               <a 
-                href="/telegram"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors text-center no-underline"
+                href="https://t.me/FilterProShv" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-gray-700 text-gray-200 px-8 py-3 rounded-lg font-medium text-center no-underline hover:underline"
               >
-                🤖 Telegram Bot Setup
+                📢 Join our channel: @FilterProShv
+              </a>
+              <a 
+                href="https://t.me/FilterProOrder" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="border border-gray-600 text-gray-300 px-8 py-3 rounded-lg font-medium text-center no-underline hover:underline"
+              >
+                👨‍💼 Contact manager: @FilterProOrder
               </a>
             </div>
           </div>
-        );
+          </div>
+        )
       case 'language':
         return <LanguageSelector onSelectLanguage={handleLanguageSelect} />;
       case 'quantity':
@@ -156,15 +174,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#02050e] p-4">
       <div className="container mx-auto max-w-lg">
-        {/* FilterPro Image at the top */}
-        <div className="text-center mb-6">
-          <img 
-            src="/lovable-uploads/10f097f0-b96d-4750-bd44-c82ae374d0d2.png" 
-            alt="FilterPro Sediment Cartridge" 
-            className="w-full max-w-md mx-auto rounded-lg shadow-lg"
-          />
-        </div>
-        
+        {showLogo && (
+          <div className="text-center mb-6">
+            <img 
+              src="/lovable-uploads/10f097f0-b96d-4750-bd44-c82ae374d0d2.png" 
+              alt="FilterPro Sediment Cartridge" 
+              className="w-full max-w-md mx-auto rounded-lg shadow-lg"
+            />
+          </div>
+        )}
         {renderStep()}
       </div>
     </div>
