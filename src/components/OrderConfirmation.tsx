@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +37,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
         <div className="bg-white/50 rounded-lg p-4">
           <div className="text-4xl mb-2">🚚</div>
           <p className="text-sm text-gray-600">
-            Your FilterPro will be delivered in Sihanoukville
+            Your FilterPro will be delivered soon, Thank you!
           </p>
           <p className="text-xs text-gray-500 mt-1">
             Free delivery • Premium quality • Fresh water

@@ -1,4 +1,3 @@
-
 import { TELEGRAM_API, PRICING, QR_PAYMENT_URLS, deliveryTimes } from "./constants.ts"
 
 export async function sendLanguageSelection(chatId: number, t: any) {
@@ -225,7 +224,9 @@ export async function sendOrderConfirmationMessages(chatId: number, t: any, sess
   const locationLink = sessionData.location ? `https://maps.google.com/?q=${sessionData.location.latitude},${sessionData.location.longitude}` : 'Not provided';
   const customerIdentifier = sessionData.phone ? sessionData.phone : (username ? `@${username}` : userId);
   
-  const orderDetails = `*New Order: [${orderId}]*
+  const orderDetails = `📋 NEW FILTERPRO ORDER
+
+*New order from Telegram bot*
   
 🔢 Quantity: ${sessionData.quantity}
 💰 Total: $${price}

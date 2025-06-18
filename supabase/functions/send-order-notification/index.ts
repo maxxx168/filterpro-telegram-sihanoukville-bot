@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderDetails, orderId } = await req.json()
+    const { orderDetails, orderId, supabaseLink } = await req.json()
 
     if (!orderDetails) {
       throw new Error('Missing orderDetails in request body')
@@ -24,17 +24,16 @@ serve(async (req) => {
     const finalOrderId = orderId || 'unknown'
 
     // Extract links from order details
-    const supabaseLinkMatch = orderDetails.match(/\[View Order in Supabase\]\(([^)]+)\)/)
     const mapsLinkMatch = orderDetails.match(/\[Delivery Location\]\(([^)]+)\)/)
     
-    const supabaseLink = supabaseLinkMatch ? supabaseLinkMatch[1] : `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders`
+    const finalSupabaseLink = supabaseLink || `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders`
     const mapsLink = mapsLinkMatch ? mapsLinkMatch[1] : 'https://maps.google.com/?q=10.6104,103.5282'
 
     // Create inline keyboard with manager actions
     const keyboard = {
       inline_keyboard: [
         [
-          { text: '📋 View in Supabase', url: supabaseLink },
+          { text: '📋 View in Supabase', url: finalSupabaseLink },
           { text: '🗺️ View Location', url: mapsLink }
         ],
         [
