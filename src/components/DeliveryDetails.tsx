@@ -73,16 +73,11 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
       },
       (error) => {
         setIsGettingLocation(false);
+        console.error('Geolocation error:', error);
         toast({
           title: "Location access denied",
-          description: "Please allow location access or enter your address manually",
+          description: "Please allow location access to continue with the order",
           variant: "destructive"
-        });
-        // Set default location with coordinates
-        setLocation({
-          latitude: 10.6104,
-          longitude: 103.5282,
-          address: '10°36\'37.4"N 103°31\'44.2"E'
         });
       },
       {

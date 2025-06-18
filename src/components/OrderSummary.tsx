@@ -62,28 +62,26 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     const supabaseLink = `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders/rows?filter=id%3Aeq%3A${orderId}`;
 
     // Format order details to match Telegram bot exactly
-    const orderDetails = `New Order: [${orderId}]
+    const orderDetails = `📋 NEW FILTERPRO ORDER
+
+"${orderId}"
 
 🔢 Quantity: ${orderData.quantity}${orderData.customQuantity ? ' (Custom)' : ''}
 💰 Total: $${total}
-
-👤 Customer Info:
-${isLoggedIn ? `📱 Telegram ID: ${telegramUserId}` : ''}${!isLoggedIn && orderData.phone ? `📱 Phone: ${orderData.phone}` : ''}${!isLoggedIn && orderData.telegramId ? `\n💬 Telegram Username: @${orderData.telegramId.replace('@', '')}` : ''}
-
+👤 Customer Info: ${isLoggedIn ? `📱 Telegram ID: ${telegramUserId}` : ''}${!isLoggedIn && orderData.phone ? `📱 Phone: ${orderData.phone}` : ''}${!isLoggedIn && orderData.telegramId ? `\n💬 Telegram Username: @${orderData.telegramId.replace('@', '')}` : ''}
 📍 Delivery Details:
 Location: ${orderData.location?.address || '10°36\'37.4"N 103°31\'44.2"E'}
 📅 Date: ${orderData.deliveryDate}
 ⏰ Time: ${orderData.deliveryTime}
-
 💳 Payment: ${orderData.paymentMethod === 'qr' ? 'QR Code Payment' : 'Cash on Delivery'}
 
-📋 [View Order in Supabase](${supabaseLink})
-🗺️ [Delivery Location](${mapsLink})
-📞 [Contact Customer](https://t.me/FilterProOrder)`;
+[View Order in Supabase](${supabaseLink})
+[Delivery Location](${mapsLink})
+[Contact Customer](https://t.me/FilterProOrder)`;
 
     try {
       const { error } = await supabase.functions.invoke('send-order-notification', {
-        body: { orderDetails },
+        body: { orderDetails, orderId },
       });
       if (error) throw error;
       console.log('Order notification sent to manager successfully via edge function.');

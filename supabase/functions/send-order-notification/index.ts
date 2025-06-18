@@ -15,17 +15,15 @@ serve(async (req) => {
   }
 
   try {
-    const { orderDetails } = await req.json()
+    const { orderDetails, orderId } = await req.json()
 
     if (!orderDetails) {
       throw new Error('Missing orderDetails in request body')
     }
 
-    // Extract order ID from the order details for inline buttons
-    const orderIdMatch = orderDetails.match(/New Order: \[([^\]]+)\]/)
-    const orderId = orderIdMatch ? orderIdMatch[1] : 'unknown'
+    const finalOrderId = orderId || 'unknown'
 
-    // Extract Supabase and Maps links
+    // Extract links from order details
     const supabaseLinkMatch = orderDetails.match(/\[View Order in Supabase\]\(([^)]+)\)/)
     const mapsLinkMatch = orderDetails.match(/\[Delivery Location\]\(([^)]+)\)/)
     
@@ -43,7 +41,7 @@ serve(async (req) => {
           { text: '💬 Contact Customer', url: 'https://t.me/FilterProOrder' }
         ],
         [
-          { text: '✅ Mark as Completed', callback_data: `complete_${orderId}` }
+          { text: '✅ Mark as Completed', callback_data: `complete_${finalOrderId}` }
         ]
       ]
     }
