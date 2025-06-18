@@ -30,6 +30,20 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
   const t = translations[language as keyof typeof translations] || translations.en;
   const isLoggedIn = !!localStorage.getItem('telegram_user_id');
 
+  const formatCoordinates = (lat: number, lng: number) => {
+    const latDeg = Math.floor(Math.abs(lat));
+    const latMin = Math.floor((Math.abs(lat) - latDeg) * 60);
+    const latSec = ((Math.abs(lat) - latDeg - latMin / 60) * 3600).toFixed(1);
+    const latDir = lat >= 0 ? 'N' : 'S';
+
+    const lngDeg = Math.floor(Math.abs(lng));
+    const lngMin = Math.floor((Math.abs(lng) - lngDeg) * 60);
+    const lngSec = ((Math.abs(lng) - lngDeg - lngMin / 60) * 3600).toFixed(1);
+    const lngDir = lng >= 0 ? 'E' : 'W';
+
+    return `${latDeg}°${latMin}'${latSec}"${latDir} ${lngDeg}°${lngMin}'${lngSec}"${lngDir}`;
+  };
+
   const handleLocationRequest = () => {
     if (!navigator.geolocation) {
       toast({
@@ -45,10 +59,11 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const formattedAddress = formatCoordinates(latitude, longitude);
         setLocation({
           latitude,
           longitude,
-          address: 'Sihanoukville, Cambodia'
+          address: formattedAddress
         });
         setIsGettingLocation(false);
         toast({
@@ -63,11 +78,11 @@ const DeliveryDetails: React.FC<DeliveryDetailsProps> = ({
           description: "Please allow location access or enter your address manually",
           variant: "destructive"
         });
-        // Set default location
+        // Set default location with coordinates
         setLocation({
           latitude: 10.6104,
           longitude: 103.5282,
-          address: 'Sihanoukville, Cambodia'
+          address: '10°36\'37.4"N 103°31\'44.2"E'
         });
       },
       {

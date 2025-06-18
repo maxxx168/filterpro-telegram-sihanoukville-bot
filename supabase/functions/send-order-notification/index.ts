@@ -21,13 +21,41 @@ serve(async (req) => {
       throw new Error('Missing orderDetails in request body')
     }
 
+    // Extract order ID from the order details for inline buttons
+    const orderIdMatch = orderDetails.match(/New Order: \[([^\]]+)\]/)
+    const orderId = orderIdMatch ? orderIdMatch[1] : 'unknown'
+
+    // Extract Supabase and Maps links
+    const supabaseLinkMatch = orderDetails.match(/\[View Order in Supabase\]\(([^)]+)\)/)
+    const mapsLinkMatch = orderDetails.match(/\[Delivery Location\]\(([^)]+)\)/)
+    
+    const supabaseLink = supabaseLinkMatch ? supabaseLinkMatch[1] : `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders`
+    const mapsLink = mapsLinkMatch ? mapsLinkMatch[1] : 'https://maps.google.com/?q=10.6104,103.5282'
+
+    // Create inline keyboard with manager actions
+    const keyboard = {
+      inline_keyboard: [
+        [
+          { text: '📋 View in Supabase', url: supabaseLink },
+          { text: '🗺️ View Location', url: mapsLink }
+        ],
+        [
+          { text: '💬 Contact Customer', url: 'https://t.me/FilterProOrder' }
+        ],
+        [
+          { text: '✅ Mark as Completed', callback_data: `complete_${orderId}` }
+        ]
+      ]
+    }
+
     const response = await fetch(`${TELEGRAM_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: CHAT_ID,
         text: orderDetails,
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown',
+        reply_markup: keyboard
       })
     })
 

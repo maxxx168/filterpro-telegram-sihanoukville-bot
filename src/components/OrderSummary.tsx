@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,25 +51,35 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     const orderId = await saveOrderToDatabase();
     
     const telegramUserId = localStorage.getItem('telegram_user_id');
-    const orderDetails = `📋 NEW FILTERPRO ORDER [${orderId}]
+    const isLoggedIn = !!telegramUserId;
+    
+    // Create Google Maps link with actual coordinates
+    const mapsLink = orderData.location ? 
+      `https://maps.google.com/?q=${orderData.location.latitude},${orderData.location.longitude}` : 
+      'https://maps.google.com/?q=10.6104,103.5282';
 
-🚰 Product: FilterPro Water Filter
+    // Create Supabase order link
+    const supabaseLink = `https://supabase.com/dashboard/project/uyjdsmdrwhrbammeivek/editor/tables/telegram_orders/rows?filter=id%3Aeq%3A${orderId}`;
+
+    // Format order details to match Telegram bot exactly
+    const orderDetails = `New Order: [${orderId}]
+
 🔢 Quantity: ${orderData.quantity}${orderData.customQuantity ? ' (Custom)' : ''}
 💰 Total: $${total}
 
 👤 Customer Info:
-${telegramUserId ? `📱 Telegram ID: ${telegramUserId}` : ''}
-${orderData.phone ? `\n📱 Phone: ${orderData.phone}` : ''}
-${orderData.telegramId ? `\n💬 Telegram Username: @${orderData.telegramId.replace('@', '')}` : ''}
+${isLoggedIn ? `📱 Telegram ID: ${telegramUserId}` : ''}${!isLoggedIn && orderData.phone ? `📱 Phone: ${orderData.phone}` : ''}${!isLoggedIn && orderData.telegramId ? `\n💬 Telegram Username: @${orderData.telegramId.replace('@', '')}` : ''}
 
 📍 Delivery Details:
-Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
+Location: ${orderData.location?.address || '10°36\'37.4"N 103°31\'44.2"E'}
 📅 Date: ${orderData.deliveryDate}
 ⏰ Time: ${orderData.deliveryTime}
 
 💳 Payment: ${orderData.paymentMethod === 'qr' ? 'QR Code Payment' : 'Cash on Delivery'}
 
-[Contact Customer](https://t.me/FilterProOrder)`;
+📋 [View Order in Supabase](${supabaseLink})
+🗺️ [Delivery Location](${mapsLink})
+📞 [Contact Customer](https://t.me/FilterProOrder)`;
 
     try {
       const { error } = await supabase.functions.invoke('send-order-notification', {
@@ -106,7 +117,7 @@ Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
           )}
           
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-300">🚰 {t.product}:</span>
+            <span className="text-sm text-gray-300">🔢 Quantity:</span>
             <Badge variant="secondary" className="bg-gray-700 text-gray-200">
               {orderData.quantity}x
               {orderData.customQuantity && ' (Custom)'}
@@ -147,7 +158,7 @@ Location: ${orderData.location?.address || 'Sihanoukville, Cambodia'}
           )}
           <div className="flex justify-between">
             <span className="text-gray-400">📍 Location:</span>
-            <span className="text-gray-200">{orderData.location?.address || 'Sihanoukville, Cambodia'}</span>
+            <span className="text-gray-200">{orderData.location?.address || '10°36\'37.4"N 103°31\'44.2"E'}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">📅 Date:</span>
