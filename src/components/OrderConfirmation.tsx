@@ -37,10 +37,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
         <div className="bg-white/50 rounded-lg p-4">
           <div className="text-4xl mb-2">🚚</div>
           <p className="text-sm text-gray-600">
-            Your FilterPro will be delivered soon, Thank you!
+            Thank you for ordering with us!
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Free delivery • Premium quality • Fresh water
+            Free delivery • Clear & clean water for all your family, at your doorstep.
           </p>
         </div>
 
