@@ -17,10 +17,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   const t = translations[language as keyof typeof translations] || translations.en;
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+    <Card className="w-full max-w-md mx-auto bg-card border-border">
       <CardHeader className="text-center">
         <div className="text-6xl mb-4">✅</div>
-        <CardTitle className="text-xl text-green-800">
+        <CardTitle className="text-xl text-foreground">
           {t.orderConfirmed}
         </CardTitle>
       </CardHeader>
@@ -34,12 +34,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           </Badge>
         </div>
         
-        <div className="bg-white/50 rounded-lg p-4">
+        <div className="bg-muted/50 rounded-lg p-4 border border-border">
           <div className="text-4xl mb-2">🚚</div>
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-foreground font-medium">
             {t.deliveryRegistered}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {t.deliveryBenefits}
           </p>
         </div>
