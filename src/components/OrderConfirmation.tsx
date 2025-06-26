@@ -36,11 +36,11 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
         
         <div className="bg-white/50 rounded-lg p-4">
           <div className="text-4xl mb-2">🚚</div>
-          <p className="text-sm text-gray-600">
-            Thank you for ordering with us!
+          <p className="text-sm text-gray-600 font-medium">
+            {t.deliveryRegistered}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Free delivery • Clear & clean water for all your family, at your doorstep.
+            {t.deliveryBenefits}
           </p>
         </div>
 

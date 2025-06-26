@@ -1,3 +1,4 @@
+
 export const translations = {
   en: {
     welcome: 'Welcome to FilterPro Bot! 🚰',
@@ -38,7 +39,9 @@ export const translations = {
     pleaseSelectTime: 'Please select a delivery time from the options above.',
     orderSubmitted: 'Your order has been submitted! 🎉\n\nOrder details sent to @FilterProOrder\nYou will receive updates soon.',
     startNewOrder: 'Start New Order',
-    payWithQR: 'Click the link below to pay with QR code:'
+    payWithQR: 'Click the link below to pay with QR code:',
+    deliveryRegistered: 'Your delivery order has been registered',
+    deliveryBenefits: 'Clear water for all your family • Easy install • Free delivery'
   },
   ru: {
     welcome: 'Добро пожаловать в FilterPro Bot! 🚰',
@@ -79,7 +82,9 @@ export const translations = {
     pleaseSelectTime: 'Пожалуйста, выберите время доставки из вариантов выше.',
     orderSubmitted: 'Ваш заказ отправлен! 🎉\n\nДетали заказа отправлены @FilterProOrder\nВскоре вы получите обновления.',
     startNewOrder: 'Начать новый заказ',
-    payWithQR: 'Нажмите на ссылку ниже для оплаты QR-кодом:'
+    payWithQR: 'Нажмите на ссылку ниже для оплаты QR-кодом:',
+    deliveryRegistered: 'Ваш заказ на доставку зарегистрирован',
+    deliveryBenefits: 'Чистая вода для всей семьи • Простая установка • Бесплатная доставка'
   },
   zh: {
     welcome: '欢迎使用 FilterPro 机器人！🚰',
@@ -120,7 +125,9 @@ export const translations = {
     pleaseSelectTime: '请从上面的选项中选择配送时间。',
     orderSubmitted: '您的订单已提交！🎉\n\n订单详情已发送给@FilterProOrder\n您很快就会收到更新。',
     startNewOrder: '开始新订单',
-    payWithQR: '点击下面的链接用二维码支付：'
+    payWithQR: '点击下面的链接用二维码支付：',
+    deliveryRegistered: '您的配送订单已注册',
+    deliveryBenefits: '为全家提供清洁水 • 安装简单 • 免费配送'
   },
   km: {
     welcome: 'សូមស្វាគមន៍មកកាន់ FilterPro Bot! 🚰',
@@ -161,6 +168,8 @@ export const translations = {
     pleaseSelectTime: 'សូមជ្រើសរើសម៉ោងដឹកជញ្ជូនពីជម្រើសខាងលើ។',
     orderSubmitted: 'ការបញ្ជាទិញរបស់អ្នកត្រូវបានដាក់ស្នើ! 🎉\n\nព័ត៌មានលម្អិតនៃការបញ្ជាទិញត្រូវបានផ្ញើទៅ @FilterProOrder\nអ្នកនឹងទទួលបានការធ្វើបច្ចុប្បន្នភាពក្នុងពេលឆាប់ៗនេះ។',
     startNewOrder: 'ចាប់ផ្តើមការបញ្ជាទិញថ្មី',
-    payWithQR: 'ចុចលើតំណខាងក្រោមដើម្បីបង់ប្រាក់ដោយ QR កូដ៖'
+    payWithQR: 'ចុចលើតំណខាងក្រោមដើម្បីបង់ប្រាក់ដោយ QR កូដ៖',
+    deliveryRegistered: 'ការបញ្ជាទិញដឹកជញ្ជូនរបស់អ្នកត្រូវបានចុះបញ្ជី',
+    deliveryBenefits: 'ទឹកស្អាតសម្រាប់គ្រួសារទាំងមូល • ដំឡើងងាយ • ដឹកជញ្ជូនឥតគិតថ្លៃ'
   }
 };
